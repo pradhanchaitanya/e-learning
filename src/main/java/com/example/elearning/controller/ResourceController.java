@@ -11,45 +11,51 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping(path = "/home")
 public class ResourceController {
 
     @Autowired
     private ResourceService resourceService;
 
-    @GetMapping("/resources")
+    @GetMapping
     public List<Resource> getAllResources() {
         return resourceService.findAll();
     }
 
-    @GetMapping("/resources/{id}")
-    public Resource getResourceById(@PathVariable Long id) {
-        return resourceService.findById(id);
-    }
-
-    @PostMapping("/resources")
-    public ResponseEntity<Resource> saveResource(@RequestBody Resource resource) {
-        Resource r = resourceService.save(resource);
-        return ResponseEntity.status(HttpStatus.CREATED).body(r);
-    }
-
-    @PutMapping("/resources/{id}")
-    public ResponseEntity<Resource> editResource(@PathVariable Long id, @RequestBody Resource resource) {
-        Resource r = null;
+    @GetMapping("{id}")
+    public ResponseEntity<Resource> getResourceById(@PathVariable Long id) {
+        Resource resource = null;
         try {
-            r = resourceService.update(id, resource);
-            return ResponseEntity.ok(r);
+            resource = resourceService.findById(id);
+            return ResponseEntity.ok(resource);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
-    @DeleteMapping("/resources/{id}")
-    public ResponseEntity<Boolean> deleteResource(@PathVariable Long id) {
+    @PostMapping
+    public ResponseEntity<String> saveResource(@RequestBody Resource resource) {
+        resourceService.save(resource);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Added Successfully");
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<String> editResource(@PathVariable Long id, @RequestBody Resource resource) {
+        try {
+            resourceService.update(id, resource);
+            return ResponseEntity.ok("Updated Successfully");
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<String> deleteResource(@PathVariable Long id) {
         try {
             resourceService.delete(id);
-            return ResponseEntity.ok(Boolean.TRUE);
+            return ResponseEntity.ok("Resource Deleted");
         } catch (ResourceNotFoundException e) {
-            return ResponseEntity.ok(Boolean.FALSE);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 

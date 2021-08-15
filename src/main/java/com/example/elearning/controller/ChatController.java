@@ -12,17 +12,18 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping(path = "/chat")
 public class ChatController {
 
     @Autowired
     private ChatService chatService;
 
-    @GetMapping("/chats")
+    @GetMapping
     public List<Chat> getAllChats() {
         return chatService.findAll();
     }
 
-    @GetMapping("/chats/{id}")
+    @GetMapping("{id}")
     public ResponseEntity<Chat> getChatById(@PathVariable Long id) {
         Chat chat = null;
         try {
@@ -33,13 +34,13 @@ public class ChatController {
         }
     }
 
-    @PostMapping("/chats")
+    @PostMapping
     public ResponseEntity<Chat> saveChat(@RequestBody Chat chat) {
         Chat c = chatService.save(chat);
         return ResponseEntity.status(HttpStatus.CREATED).body(c);
     }
 
-    @PutMapping("/chats/{id}")
+    @PutMapping("{id}")
     public ResponseEntity<Chat> editChat(@PathVariable Long id, @RequestBody Chat chat) {
         Chat c = null;
         try {
@@ -50,7 +51,7 @@ public class ChatController {
         }
     }
 
-    @DeleteMapping("/chats/{id}")
+    @DeleteMapping("{id}")
     public ResponseEntity<Boolean> deleteChat(@PathVariable Long id) {
         try {
             chatService.delete(id);

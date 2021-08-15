@@ -22,8 +22,13 @@ public class ResourceService {
         return resourceRepository.findAll();
     }
 
-    public Resource findById(Long id) {
-        return resourceRepository.getById(id);
+    public Resource findById(Long id) throws ResourceNotFoundException {
+        Resource resource =
+                resourceRepository
+                        .findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("Resource not found on :: " + id));
+
+        return resource;
     }
 
     public Resource update (Long id, Resource resource) throws ResourceNotFoundException {

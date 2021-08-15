@@ -1,27 +1,34 @@
 package com.example.elearning.controller;
 
 import com.example.elearning.exception.ResourceNotFoundException;
+import com.example.elearning.model.Resource;
 import com.example.elearning.model.User;
+import com.example.elearning.service.ResourceService;
 import com.example.elearning.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.websocket.server.PathParam;
 import java.util.List;
 
 @RestController
-public class UserController {
+@RequestMapping(path = "/admin")
+public class AdminController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private ResourceService resourceService;
 
-    @GetMapping("/users")
+    @GetMapping
     public List<User> getAllUsers() {
         return userService.findAll();
     }
 
-    @GetMapping("/users/{id}")
+    /*
+    @GetMapping("{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         User user = null;
         try {
@@ -31,14 +38,20 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
+    */
 
-    @PostMapping("/users")
-    public ResponseEntity<User> saveUser(@RequestBody User user) {
-        User u = userService.save(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(u);
+    @PostMapping("/verify/{id}")
+    public ResponseEntity<String> verifyUser(@PathVariable Long id) {
+        try {
+            userService.verifyUser(id);
+            return ResponseEntity.status(HttpStatus.CREATED).body("User Verified");
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
-    @PutMapping("/users/{id}")
+    /*
+    @PutMapping("{id}")
     public ResponseEntity<User> editUser(@PathVariable Long id, @RequestBody User user) {
         User u = null;
         try {
@@ -48,14 +61,26 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
+    */
 
-    @DeleteMapping("/users/{id}")
-    public ResponseEntity<Boolean> deleteUser(@PathVariable Long id) {
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         try {
             userService.delete(id);
-            return ResponseEntity.ok(Boolean.TRUE);
+            return ResponseEntity.ok("User deleted");
         } catch (ResourceNotFoundException e) {
-            return ResponseEntity.ok(Boolean.FALSE);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @PutMapping("/resource/{id}")
+    public ResponseEntity<String> updateResource(@PathVariable Long id, Resource resource) {
+        try {
+            resourceService.update(id, resource);
+            return ResponseEntity.ok("Updated Success");
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 }

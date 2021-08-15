@@ -35,6 +35,14 @@ public class UserService {
         return user;
     }
 
+    public User findByUsername(String username) throws ResourceNotFoundException {
+        User user =
+                userRepository
+                        .findByUsername(username)
+                        .orElseThrow(() -> new ResourceNotFoundException("User not found on :: " + username));
+        return user;
+    }
+
     public User update(Long id, User user) throws ResourceNotFoundException {
         User old =
                 userRepository
@@ -59,5 +67,15 @@ public class UserService {
                         .orElseThrow(() -> new ResourceNotFoundException("User not found on :: " + id));
 
         userRepository.delete(user);
+    }
+
+    public void verifyUser(Long id) throws ResourceNotFoundException {
+        User user =
+                userRepository
+                        .findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("User not found on :: " + id));
+
+        user.setActive(Boolean.TRUE);
+        update(id, user);
     }
 }
